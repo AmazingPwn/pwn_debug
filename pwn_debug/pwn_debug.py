@@ -250,8 +250,8 @@ class pwn_debug(object):
 
 
     def run_remote(self,host,port):
-        if self.pwn_name[0]:
-            self.elf=ELF(self.pwn_name[0])
+        if self.pwn_name:
+            self.elf=ELF(self.pwn_name)
         if self.libc_path is None:
             self.set_libc()
         self.libc = ELF(self.libc_path)
