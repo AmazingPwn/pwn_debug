@@ -20,7 +20,7 @@ def getNum(num):
 class pwn_debug(object):
     def __init__(self,pwn_name):
         self.args = []
-        self.addso = []
+        self.addso = set()
         if isinstance(pwn_name, list):
             self.pwn_name=pwn_name[0]
             if len(pwn_name) > 1:
@@ -79,12 +79,12 @@ class pwn_debug(object):
                 log.error("not a elf file")
                 exit(0)
 
-    def add_so(self, so):
+    def set_so(self, so):
         if not isinstance(so, list):
             so = [so]
         for i in so:
             if os.path.exists(i):
-                self.addso.append(os.path.realpath(i))
+                self.addso.add(os.path.dirname(os.path.realpath(i)))
             else:
                 log.error("set additional so file: %s fail."%i)
 
@@ -164,7 +164,10 @@ class pwn_debug(object):
                       "please see the installation manual"%self.libc_path)
             exit(0)
         self.env=env
-        self.env["LD_PRELOAD"]=self.libc_path
+        if "LD_PRELOAD" in self.env:
+            self.env["LD_PRELOAD"] = self.env["LD_PRELOAD"] +" "+ self.libc_path
+        else:
+            self.env["LD_PRELOAD"] = self.libc_path
 
 
     def run_init(self):

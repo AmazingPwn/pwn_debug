@@ -60,7 +60,11 @@ class pwn_start(object):
             self.fork_follow = "parent"
 
         self.pdbg=pwn_debug(self.name)
-        self.pdbg.set_libc(self.libc, self.ld)
+        
+        preload = self.so
+        if isinstance(self.so, list):
+            preload = " ".join(self.so)
+        self.pdbg.set_libc(self.libc, self.ld, {"LD_PRELOAD":preload})
         if self.so is not None:
             self.pdbg.set_so(self.so)
         self.pdbg.context.log_level = args.log_level
@@ -90,7 +94,8 @@ class pwn_start(object):
         return p
     
     def debug(self):
-        self.pdbg.debug(self.scripts, self.fork_follow)
+        if not self.remote:
+            self.pdbg.debug(self.scripts, self.fork_follow)
 
 """
 if __name__ == "__main__":
